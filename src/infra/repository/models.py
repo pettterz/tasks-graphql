@@ -1,90 +1,51 @@
 from typing import List
 
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import (Column, DateTime, Enum as EnumColumn, ForeignKey,
-                        String)
-from sqlalchemy.orm import declarative_base, registry, relationship, Mapped
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import (
+    registry,
+    relationship,
+    mapped_column,
+    Mapped
+)
 from sqlalchemy.sql import func
-from sqlalchemy_utils import UUIDType
 import uuid
 
 
 class Status(str, Enum):
-    TODO = 'todo'
-    DOING = 'doing'
-    DONE = 'done'
+    TODO = "todo"
+    DOING = "doing"
+    DONE = "done"
 
 
-Base = declarative_base()
-# mapper_registry = registry()
+reg = registry()
 
 
-@dataclass
-# @mapper_registry.mapped
-class Task(Base):
+@reg.mapped_as_dataclass
+class Task:
     __tablename__ = "tasks"
-    __allow_unmapped__ = True
-    title: str = Column('title', String(200))
-    id: uuid.UUID = Column('id', UUIDType(binary=False), primary_key=True,
-                           default=uuid.uuid4)
-    description: str = Column('description', String(200))
-    status: Status = Column('status', EnumColumn(Status))
-    updated_at: datetime = Column('updated_at', DateTime, default=func.now())
-    board_id: uuid.UUID = Column(UUIDType(binary=False),
-                                 ForeignKey("boards.id"))
-    # board: "Board" = relationship("Board", back_populates="tasks")
+
+    id: Mapped[str] = mapped_column(primary_key=True, default=uuid.uuid4)
+    title: Mapped[str] = mapped_column(default="")
+    description: Mapped[str] = mapped_column(default="")
+    status: Mapped[str] = mapped_column(default="todo")
+    updated_at: Mapped[datetime] = mapped_column(default=func.now())
+    board_id: Mapped[str] = mapped_column(ForeignKey("boards.id"),
+                                          default=uuid.uuid4)
+    board: Mapped["Board"] = relationship(default=None)
 
 
-@dataclass
-class Board(Base):
+@reg.mapped_as_dataclass
+class Board:
     __tablename__ = "boards"
-    title: str = Column('title', String(200))
-    id: uuid.UUID = Column('id', UUIDType(binary=False), primary_key=True,
-                           default=uuid.uuid4)
-    description: str = Column('description', String(200))
-    updated_at: datetime = Column('updated_at', DateTime, default=func.now())
-    # tasks: list["Task"] = relationship(
-    #     "Task", back_populates="board"
-    # )
 
-    # __annotations__ = {"tasks": "Mapped[Task]"}
+    id: Mapped[str] = mapped_column(primary_key=True, default=uuid.uuid4)
+    title: Mapped[str] = mapped_column(default="")
+    description: Mapped[str] = mapped_column(default="")
+    updated_at: Mapped[datetime] = mapped_column(default=func.now())
 
-
-
-    # __annotations__ = {"board": "Mapped[Board]"}
-    # __mapper_args__ = {  # type: ignore
-    #     "properties": {
-    #         "board": relationship("Board", back_populates="tasks"),
-    #     }
-    # }
-
-
-# # Taskテーブルの定義
-# task = Table(
-#     'task',
-#     mapper_registry.metadata,
-#     Column('id', UUIDType(binary=False), primary_key=True, default=uuid.uuid4),
-#     Column('description', String(200)),
-#     Column('title', String(200)),
-#     Column('status', Enum(Status)),
-#     Column('updated_at', DateTime, default=func.now()),
-#     Column('board_id', ForeignKey('board.id'))
-# )
-# mapper_registry.map_imperatively(Task, task)
-
-# Define for Board
-
-
-
-# board = Table(
-#     'board',
-#     mapper_registry.metadata,
-#     Column('id', UUIDType(binary=False), primary_key=True, default=uuid.uuid4),
-#     Column('description', String(200)),
-#     Column('title', String(200)),
-#     Column('updated_at', DateTime, default=func.now())
-# )
-# mapper_registry.map_imperatively(Board, board)
+    tasks: Mapped[List["Task"]] = relationship(
+        default_factory=list, back_populates="board"
+    )

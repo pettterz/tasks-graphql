@@ -1,6 +1,6 @@
 import strawberry
 
-from web.task.inputs import AddTaskInput, UpdateTaskInput
+from web.task.inputs import AddTaskInput, UpdateTaskInput, AddBoardInput, UpdateBoardInput
 from web.task.types import TaskType, BoardType
 from strawberry.types import Info
 
@@ -54,14 +54,14 @@ def get_boards(info: Info) -> list[BoardType]:
     return boards
 
 
-def add_board(board_input: AddTaskInput, info: Info) -> BoardType:
+def add_board(board_input: AddBoardInput, info: Info) -> BoardType:
     service = info.context.get_board()
     board = service.create(**board_input.__dict__)
 
     return board
 
 
-def update_board(board_input: UpdateTaskInput, info: Info) -> BoardType:
+def update_board(board_input: UpdateBoardInput, info: Info) -> BoardType:
     service = info.context.get_board()
     board = service.update(**board_input.__dict__)
 
@@ -71,5 +71,7 @@ def update_board(board_input: UpdateTaskInput, info: Info) -> BoardType:
 def delete_board(id: strawberry.ID, info: Info) -> BoardType:
     service = info.context.get_board()
     board = service.delete(id)
+
+    # TODO Delete all tasks first
 
     return board

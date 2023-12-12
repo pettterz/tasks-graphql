@@ -13,7 +13,6 @@ class TaskRepository:
         return task
 
     def find_all(self) -> list[Task]:
-        # tasks = list(cls._store.values())
         tasks = self.__db.query(Task).all()
 
         return tasks

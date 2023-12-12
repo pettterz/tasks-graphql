@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from infra.repository.models import Base
+from infra.repository.models import reg
 
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///../db/tasks.db'
@@ -17,7 +17,7 @@ class DatabaseContext:
 
         self.SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=engine)
-        # Base = mapper_registry.generate_base()
+        Base = reg.generate_base()
         Base.metadata.create_all(bind=engine)
 
 
