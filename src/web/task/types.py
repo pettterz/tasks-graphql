@@ -3,9 +3,9 @@ from typing import Optional, List
 
 import strawberry
 
-from infra.repository.models import Status
+# from infra.repository.models import Status
 
-StatusType = strawberry.enum(Status, name="Status")
+# StatusType = strawberry.enum(Status, name="Status")
 
 
 @strawberry.type(name="Task")
@@ -13,7 +13,7 @@ class TaskType:
     id: strawberry.ID
     title: str
     description: Optional[str]
-    status: StatusType
+    status: str
     updated_at: datetime
     board: "BoardType"
     board_id: str

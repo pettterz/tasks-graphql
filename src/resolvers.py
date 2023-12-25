@@ -47,6 +47,12 @@ def get_board(id: strawberry.ID, info: Info) -> BoardType:
     return board
 
 
+def get_tasks_by_board(id: strawberry.ID, info: Info) -> list[TaskType]:
+    board = get_board(id, info)
+
+    return board.tasks
+
+
 def get_boards(info: Info) -> list[BoardType]:
     service = info.context.get_board()
     boards = service.find_all()

@@ -3,7 +3,7 @@ from typing import List
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import (
     registry,
     relationship,
@@ -23,17 +23,22 @@ class Status(str, Enum):
 reg = registry()
 
 
+def id_factory():
+    return str(uuid.uuid4())
+
+
 @reg.mapped_as_dataclass
 class Task:
     __tablename__ = "tasks"
 
-    id: Mapped[str] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String, primary_key=True,
+                                    default_factory=id_factory)
     title: Mapped[str] = mapped_column(default="")
     description: Mapped[str] = mapped_column(default="")
-    status: Mapped[str] = mapped_column(default="todo")
+    status: Mapped[str] = mapped_column(default="TODO")
     updated_at: Mapped[datetime] = mapped_column(default=func.now())
-    board_id: Mapped[str] = mapped_column(ForeignKey("boards.id"),
-                                          default=uuid.uuid4)
+    board_id: Mapped[str] = mapped_column(String, ForeignKey("boards.id"),
+                                          default_factory=uuid.uuid4)
     board: Mapped["Board"] = relationship(default=None)
 
 
@@ -41,7 +46,8 @@ class Task:
 class Board:
     __tablename__ = "boards"
 
-    id: Mapped[str] = mapped_column(primary_key=True, default=uuid.uuid4)
+    id: Mapped[str] = mapped_column(String, primary_key=True,
+                                    default_factory=id_factory)
     title: Mapped[str] = mapped_column(default="")
     description: Mapped[str] = mapped_column(default="")
     updated_at: Mapped[datetime] = mapped_column(default=func.now())

@@ -23,8 +23,11 @@ class TaskService:
 
         return tasks
 
-    def create(self, *, title: str, description: Optional[str] = None) -> Task:
-        task = Task(title=title, description=description)
+    def create(self, *, title: str, description: Optional[str] = None,
+               board_id: str) -> Task:
+
+        task = Task(title=title, description=description, board_id=board_id)
+
         self.repo.save(task)
 
         return task

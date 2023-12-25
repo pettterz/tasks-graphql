@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
+from uuid import UUID
 
-from infra.repository.models import Task
+from infra.repository.models import Task, Board
 
 
 class TaskRepository:
